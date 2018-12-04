@@ -15,8 +15,8 @@
 	    ></v-text-field>
 		<v-divider></v-divider>
 			<v-text-field light solo
-			placeholder="Кафедра"
-	      v-model="kafedra"
+			placeholder="Факультет"
+	      v-model="faculty"
 	    ></v-text-field>
 		<v-text-field light solo
 			placeholder="Група"
@@ -56,9 +56,18 @@
 			return {
 				email: '',
 				password: '',
-				kafedra: '',
+				faculty: '',
 				group: '',
 				admin: false,
+				emptySchedule: {
+					user: "",
+					admin: false,
+					group: "",
+					faculty: "",
+					schedules: {
+						list :[]
+					}
+				},
 				generalSchedule: '',
 				scheduleName: '',
 				items: [
@@ -89,18 +98,34 @@
 	      }
 	    },
 		methods: {
-			signUp: function() {
-				firebase.firebaseMain.auth().createUserWithEmailAndPassword(this.email, this.password).then(
-					function (user) {
-						alert('created');
-					},
-					function (err) {
-						alert('Error ' + err.message)
+				onSignup () {
+					let scheduleList = (this.admin) ? this.scheduleName : this.group;
+					let preJson = {
+						admin: this.admin,
+						group: this.group,
+						faculty: this.faculty,
+						schedules: {
+							list : [scheduleList],
+							[scheduleList]: {
+								weeks: ["weekTop"],
+								weekTop: {
+									name: "Чисельник",
+									days: ["day1"],
+									day1: {
+										name: "Понеділок",
+										subjects: []
+									}
+								}
+							}
+						}
 					}
-				)
-			},
-			onSignup () {
-		        this.$store.dispatch('signUserUp', {email: this.email, password: this.password})
+					
+				let payload = {
+					email: this.email, 
+					password: this.password,
+					json: preJson
+				}
+		        this.$store.dispatch('signUserUp', payload);
 		      },
 		      onSigninGoogle () {
 		        this.$store.dispatch('signUserInGoogle')

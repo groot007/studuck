@@ -1,9 +1,10 @@
 <template>
-	<div @click="clicked" class="day monday" v-bind:class="className">
+	<div class="day monday" v-bind:class="className">
 	  <h2><input type="text" value="Monday" class="hidden"><span>{{ dayDataLocal.name }}</span> </h2>
-    <div class="edit-icon" @click="editMode = !editMode">
-       <v-icon v-if="!editMode">edit</v-icon>
-       <v-icon v-if="editMode">save</v-icon>
+    <div class="edit-icon">
+       <v-icon v-if="!editMode" @click="changeEditMode(dayItem)">edit</v-icon>
+       <v-icon v-if="editMode" @click="changeEditMode(dayItem, 'remove')">remove</v-icon>
+       <v-icon v-if="editMode" @click="changeEditMode(dayItem, 'save')">save</v-icon>
     </div>
 	  <ul>
 	  	<li v-for="(item, i) in dayDataLocal.subjects">
@@ -16,7 +17,7 @@
             <span v-if="!editMode" class="subject-title">{{ dayDataLocal[item].title }} </span> 
              <v-text-field
               v-if="editMode"
-              :value="dayDataLocal[item].title"
+              v-model="dayDataLocal[item].title"
               placeholder="Назва предмету"
               box
             ></v-text-field>
@@ -25,7 +26,7 @@
             <span v-if="!editMode" class="teacher">{{ dayDataLocal[item].teacher }}</span>
             <v-text-field
               v-if="editMode"
-              :value="dayDataLocal[item].teacher"
+              v-model="dayDataLocal[item].teacher"
               placeholder="Викладач"
               box
             ></v-text-field>
@@ -35,13 +36,15 @@
           <div class="wrap">
             <v-text-field
               v-if="editMode"
-              :value="dayData[item].room"
+              v-model="dayDataLocal[item].room"
               placeholder="Аудиторія"
               box
             ></v-text-field>
-            <span v-if="!editMode" class="place">{{ dayData[item].room }}</span>
+            <span v-if="!editMode" class="place">{{ dayDataLocal[item].room }}</span>
           </div> 
-        </div>        
+        </div> 
+
+        <v-icon v-if="editMode" @click="removeSubject(item)">remove</v-icon>       
 	  	</li>
       <li v-if="editMode" @click="addSubject()">
         <v-icon>add_circle_outline</v-icon>
@@ -57,7 +60,7 @@
 <script>
   
 	export default {
-		props: ['className', 'title', 'dayData'],
+		props: ['className', 'title', 'dayData', 'dayItem', 'scheduleItem', 'weekItem', 'allData'],
 		data() {
 			return {
         dayDataLocal: this.dayData,
@@ -66,6 +69,11 @@
 				day: "Monday"
 			}
 		},
+    computed: {
+      user () {
+        return this.$store.getters.user
+      }
+    },
 		methods: {
 			clicked() {
 				console.log(this.dayData);
@@ -74,6 +82,36 @@
         let idx = this.dayDataLocal.subjects.length + 1;
         this.dayDataLocal.subjects.push("subj" + idx);
         this.dayDataLocal["subj" + idx] = {};
+      },
+      removeSubject(item) {
+        let index = this.dayDataLocal.subjects.indexOf(item);
+          if (index > -1) {
+            this.dayDataLocal.subjects.splice(index, 1);
+          }
+          delete this.dayDataLocal[item];
+      },
+      changeEditMode(dayItem, action) {
+        if (action == "remove") {
+          let data = this.allData.schedules[this.scheduleItem][this.weekItem];
+          let index = data.days.indexOf(dayItem);
+          if (index > -1) {
+            data.days.splice(index, 1);
+          }
+          delete data[dayItem];
+
+          this.$store.commit("setUserSchedule", JSON.stringify(this.allData));
+          this.$store.dispatch('updateData', this.user.id);
+
+        } else if (action == "save") {
+          let parseLocal = JSON.parse(JSON.stringify(this.dayDataLocal));
+
+          this.allData.schedules[this.scheduleItem][this.weekItem][dayItem] = parseLocal ;
+          this.$store.commit("setUserSchedule", JSON.stringify(this.allData));
+          this.$store.dispatch('updateData', this.user.id);
+        }
+
+
+        this.editMode = !this.editMode;
       }
 		},
 		created: function () {

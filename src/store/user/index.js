@@ -12,10 +12,10 @@ export default {
   mutations: {
     setUser (state, payload) {
       state.user = payload
-      console.log("setUser");
     },
     setUserSchedule (state, payload) {
         state.userSchedule = payload;
+        localStorage.setItem(state.user.id, payload);
     },
     removePreloader (state, payload) {
       state.preloader = payload
@@ -27,15 +27,18 @@ export default {
       commit('clearError')
       firebase.firebaseMain.auth().createUserWithEmailAndPassword(payload.email, payload.password)
         .then(
-          user => {
-            commit('setLoading', false)
+          function (user) {
+            let userId = firebase.firebaseMain.auth().currentUser.uid
+            commit('setLoading', false);
             const newUser = {
-              id: user.uid,
-              name: user.displayName,
-              email: user.email,
-              photoUrl: user.photoURL
+              id: userId.uid,
+              name: userId.displayName,
+              email: userId.email,
+              photoUrl: userId.photoURL
             }
             commit('setUser', newUser);
+            firebase.db.collection("users-schedules").doc(userId).set(payload.json);
+            commit("setUserSchedule", JSON.stringify(payload.json));
           }
         )
         .catch(
@@ -45,6 +48,10 @@ export default {
             console.log(error)
           }
         )
+    },
+    setDefaultData ({commit, getters}, payload) {
+      let userId = getters.user;
+      console.log(userId);
     },
     signUserIn ({commit}, payload) {
       commit('setLoading', true)
@@ -232,10 +239,13 @@ export default {
       commit('setUser', null)
       router.replace('login')
     },
+    saveNewUser({commit, state, getters}, payload) {
+      
+    },
+
     saveUserData({commit, state, getters}, userId) {
       firebase.db.collection("users-schedules").doc(userId).get().then( rez => {
         commit('setUserSchedule', JSON.stringify(rez.data()));
-        localStorage.setItem(userId, JSON.stringify(rez.data()));
       })
     }
   },

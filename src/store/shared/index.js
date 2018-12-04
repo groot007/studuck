@@ -19,10 +19,20 @@ export default {
 	},
 	actions: {
 		getJsonData (state, user) {
-			if (!this.state.jsonData && navigator.onLine) {
+			if (!this.state.jsonData) {
 				this.state.jsonData = firebase.db.collection("users-schedules").doc(user).get();
 			}
 			return this.state.jsonData;
+		},
+
+		updateData (state, user) {
+			console.log(user, state.user);
+			var json = JSON.parse(localStorage.getItem(user));
+			firebase.db.collection("users-schedules").doc(user).set(json);
+		},
+
+		sendMessage ({commit}, payload) {
+			firebase.db.collection("notification").doc(payload.group).set(payload.json);
 		}
 	},
 	getters: {
