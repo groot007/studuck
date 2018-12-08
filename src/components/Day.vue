@@ -1,72 +1,191 @@
 <template>
-	<div class="day monday" v-bind:class="className">
-	  <h2><input type="text" value="Monday" class="hidden"><span>{{ dayDataLocal.name }}</span> </h2>
-    <div class="edit-icon">
-       <v-icon v-if="!editMode" @click="changeEditMode(dayItem)">edit</v-icon>
-       <v-icon v-if="editMode" @click="changeEditMode(dayItem, 'remove')">remove</v-icon>
-       <v-icon v-if="editMode" @click="changeEditMode(dayItem, 'save')">save</v-icon>
-    </div>
-	  <ul>
-	  	<li v-for="(item, i) in dayDataLocal.subjects">
-        <div class="counter">
-          <span class="count">{{ i + 1 }}.</span> <br>
-          <!-- <span><v-icon>info</v-icon></span> -->
-        </div>
-        <div class="main">
-          <div class="sub-wrap">
-            <span v-if="!editMode" class="subject-title">{{ dayDataLocal[item].title }} </span> 
-             <v-text-field
-              v-if="editMode"
-              v-model="dayDataLocal[item].title"
-              placeholder="Назва предмету"
-              box
-            ></v-text-field>
+	<div class="day monday" v-bind:class="{[className]: true, 'edit-mode': editMode}" >
+    <div class="wrap-schedule-main" v-if="showDay">
+      <form>
+  	  <h2><input type="text" value="Monday" class="hidden">
+        <span v-if="!editMode">{{ dayDataLocal.name }}</span> 
+         <v-text-field
+                v-if="editMode"
+                v-model="dayDataLocal.name"
+                placeholder="Назва дня"
+                box
+                require
+              ></v-text-field>
+      </h2>
+      <div class="edit-icon">
+         <v-icon v-if="!editMode" @click="changeEditMode(dayItem)">edit</v-icon>
+         <v-icon v-if="editMode" @click="changeEditMode(dayItem, 'remove')">clear</v-icon>
+         <v-icon v-if="editMode" @click="changeEditMode(dayItem, 'save')">save</v-icon>
+      </div>
+  	  <ul>
+  	  	<li v-for="(item, i) in dayDataLocal.subjects">
+          <div class="counter">
+            <span class="count">{{ i + 1 }}.</span> <br>
+            <!-- <span><v-icon>info</v-icon></span> -->
           </div>
-          <div class="teacher-wrap"  v-if="dayDataLocal[item].teacher || editMode">
-            <span v-if="!editMode" class="teacher">{{ dayDataLocal[item].teacher }}</span>
-            <v-text-field
-              v-if="editMode"
-              v-model="dayDataLocal[item].teacher"
-              placeholder="Викладач"
-              box
-            ></v-text-field>
+          <div class="main">
+            <div class="sub-wrap">
+              <span v-if="!editMode" class="subject-title">{{ dayDataLocal[item].title }} </span> 
+               <v-text-field
+                v-if="editMode"
+                v-model="dayDataLocal[item].title"
+                placeholder="Назва предмету"
+                box
+              ></v-text-field>
+            </div>
+            <div class="teacher-wrap"  v-if="dayDataLocal[item].teacher || editMode">
+              <span v-if="!editMode" @click="showTeacher(dayDataLocal[item].teacher)" class="teacher">{{ dayDataLocal[item].teacher }}</span>
+              <v-text-field
+                v-if="editMode"
+                v-model="dayDataLocal[item].teacher"
+                placeholder="Викладач"
+                box
+              ></v-text-field>
+            </div>
           </div>
-        </div>
-        <div class="room">
-          <div class="wrap">
-            <v-text-field
-              v-if="editMode"
-              v-model="dayDataLocal[item].room"
-              placeholder="Аудиторія"
-              box
-            ></v-text-field>
-            <span v-if="!editMode" class="place">{{ dayDataLocal[item].room }}</span>
+          <div class="room">
+            <div class="wrap">
+              <v-text-field
+                v-if="editMode"
+                v-model="dayDataLocal[item].room"
+                placeholder="Аудиторія"
+                box
+              ></v-text-field>
+              <span v-if="!editMode" class="place">{{ dayDataLocal[item].room }}</span>
+            </div> 
           </div> 
-        </div> 
+          <div class="edit-info">
+            <v-icon v-if="editMode" @click="removeSubject(item, 'clear')">block</v-icon>       
+          <v-icon v-if="editMode" @click="removeSubject(item, 'remove')">remove</v-icon>       
+          <v-icon v-if="!editMode" @click="showMarks(item)">info</v-icon>
+            
+          </div>
+                 
+  	  	</li>
+        <li v-if="editMode" @click="addSubject()">
+          <v-icon>add_circle_outline</v-icon>
+        </li>
+  	  </ul>
+  	  <div class="corner">
+  	     <div class="bg"></div>
+  	     <div class="light"></div>
+  	  </div>
 
-        <v-icon v-if="editMode" @click="removeSubject(item)">remove</v-icon>       
-	  	</li>
-      <li v-if="editMode" @click="addSubject()">
-        <v-icon>add_circle_outline</v-icon>
-      </li>
-	  </ul>
-	  <div class="corner">
-	     <div class="bg"></div>
-	     <div class="light"></div>
-	  </div>
+      </form>
+    </div>
+    <div class="teacher-details" v-if="showTeacherBlock">
+      <img :src="teacher.photo_url">
+      <span>{{teacher.surname}}</span>
+      <span>{{teacher.name}}</span>
+      <div><a href="#" @click.prevent="showTeacher">Назад</a></div>
+    </div>
+    <div class="marks-block" v-if="showMarksBlock">
+      <h2>Оцінки {{ marksSubject }}</h2>
+      <div>
+        <form>
+        <div class="module-1">
+             <v-data-iterator
+                :items="items"
+                :rows-per-page-items="rowsPerPageItems"
+                :pagination.sync="pagination"
+                content-tag="v-layout"
+                row
+                wrap
+                light
+                hide-actions
+              >
+                <v-flex
+                  slot="item"
+                  slot-scope="props"
+                  xs12
+                  sm12
+                  md12
+                  lg12
+                >
+                  <v-card>
+                    <v-card-title><h4>{{ props.item.name }}</h4></v-card-title>
+                    <v-divider></v-divider>
+                    <v-list dense>
+                      <v-list-tile>
+                        <v-list-tile-content>Здано :</v-list-tile-content>
+                        <v-list-tile-content class="align-end">
+                          <v-icon @click.prevent="props.item.lab++">add_circle_outline</v-icon>  
+                          <v-icon @click.prevent="props.item.lab--">remove</v-icon>  
+                          <span>{{ props.item.lab }}</span>
+                          <span>/</span>
+                          <span>{{ props.item.labs }}</span>
+                        </v-list-tile-content>
+                      </v-list-tile>
+                      <v-list-tile>
+                        <v-list-tile-content>Поточка:</v-list-tile-content>
+                        <v-list-tile-content class="align-end">
+                          <v-icon @click.prevent="props.item.regular++">add_circle_outline</v-icon>  
+                          <v-icon @click.prevent="props.item.regular--">remove</v-icon> 
+                          {{ props.item.regular }}
+                        </v-list-tile-content>
+                      </v-list-tile>
+                      <v-list-tile>
+                        <v-list-tile-content>Модуль:</v-list-tile-content>
+                        <v-list-tile-content class="align-end">
+                          <v-text-field
+                            v-model="props.item.test"
+                            placeholder="Модуль"
+                            box
+                          ></v-text-field>
+                          {{ props.item.test }}
+                        </v-list-tile-content>
+                      </v-list-tile>
+                    </v-list>
+                  </v-card>
+                </v-flex>
+              </v-data-iterator>
+        </div>
+        </form>
+        <a href="#"  style="color: #fff;" @click.prevent="showMarks">Назад</a>
+      </div>
+    </div>
 	</div>
 </template>
 
 <script>
-  
+  import firebase from '../shared/firebase';
+
 	export default {
-		props: ['className', 'title', 'dayData', 'dayItem', 'scheduleItem', 'weekItem', 'allData'],
+		props: ['className', 'title', 'teachers', 'dayData', 'dayItem', 'scheduleItem', 'weekItem', 'allData'],
 		data() {
 			return {
         dayDataLocal: this.dayData,
         editMode: false,
 				titleSub: this.$store.state.title,
-				day: "Monday"
+				day: "Monday",
+        photo_url: '',
+        teacher: {},
+        showTeacherBlock: false,
+        showMarksBlock: false,
+        showDay: true,
+        activeSubj: 'subj1',
+        marksSubject: '',
+        rowsPerPageItems: [4, 8, 12],
+        pagination: {
+          rowsPerPage: 4
+        },
+        items0: {
+            value: false,
+            id: 'mod1',
+            name: 'Модуль 1',
+            lab: 0,
+            regular: 0,
+            test: 0,
+        },
+        items1: {
+            value: false,
+            id: 'mod2',
+            name: 'Модуль 2',
+            lab: 0,
+            regular: 0,
+            test: 0,
+        },
+        items: [this.items0, this.items1]
 			}
 		},
     computed: {
@@ -81,34 +200,75 @@
       addSubject() {
         let idx = this.dayDataLocal.subjects.length + 1;
         this.dayDataLocal.subjects.push("subj" + idx);
-        this.dayDataLocal["subj" + idx] = {};
+        this.dayDataLocal["subj" + idx] = {marks: [this.items0, this.items1]};
       },
-      removeSubject(item) {
-        let index = this.dayDataLocal.subjects.indexOf(item);
+      removeSubject(item, action) {
+        if (action == 'clear') {
+          this.dayDataLocal[item].title = '';
+          this.dayDataLocal[item].teacher = '';
+          this.dayDataLocal[item].room = '';
+          this.dayDataLocal[item].marks = this.items;
+        } else {
+          let index = this.dayDataLocal.subjects.indexOf(item);
           if (index > -1) {
             this.dayDataLocal.subjects.splice(index, 1);
           }
-          delete this.dayDataLocal[item];
+          // delete this.dayDataLocal[item]; 
+        }
+
+      },
+      showMarks(item) {
+        if (this.showDay) {
+          let marks = this.dayData[item].marks;
+          console.log(marks);
+          this.activeSubj = item;
+          this.items[0] = (marks && marks[0]) ? marks[0] : this.items0;
+          this.items[1] = (marks && marks[1]) ? marks[1] : this.items1;
+          this.marksSubject = this.dayData[item].title;
+          this.showMarksBlock = true;
+          this.showDay = false;
+        } else {
+          this.showMarksBlock = false;
+          this.showDay = true;
+          this.dayData[this.activeSubj].marks = [this.items[0], this.items[1]];
+          let parseLocal = JSON.parse(JSON.stringify(this.dayData));
+          this.allData.schedules[this.scheduleItem][this.weekItem][this.dayItem] = parseLocal ;
+          this.$store.commit("setUserSchedule", JSON.stringify(this.allData));
+          this.$store.dispatch('updateData', this.user.id);
+        }
+      },
+      showTeacher() {
+        if (this.showDay) {
+          this.showTeacherBlock = true;
+          this.showDay = false;
+          for (var item in this.teachers) {
+            console.log(item);
+            if (this.teachers[item].surname == 'Олексів') {
+              this.teacher.photo_url = this.teachers[item].photo_url;
+              this.teacher.surname = this.teachers[item].surname;
+            }
+          }
+        } else {
+          this.showTeacherBlock = false;
+          this.showDay = true;  
+        }
+
       },
       changeEditMode(dayItem, action) {
         if (action == "remove") {
           let data = this.allData.schedules[this.scheduleItem][this.weekItem];
-          let index = data.days.indexOf(dayItem);
+          let index = data.days.indexOf(this.dayItem);
           if (index > -1) {
             data.days.splice(index, 1);
           }
-          delete data[dayItem];
-
-          this.$store.commit("setUserSchedule", JSON.stringify(this.allData));
-          this.$store.dispatch('updateData', this.user.id);
-
+          // delete data[this.dayItem];
         } else if (action == "save") {
           let parseLocal = JSON.parse(JSON.stringify(this.dayDataLocal));
-
-          this.allData.schedules[this.scheduleItem][this.weekItem][dayItem] = parseLocal ;
-          this.$store.commit("setUserSchedule", JSON.stringify(this.allData));
-          this.$store.dispatch('updateData', this.user.id);
+          this.allData.schedules[this.scheduleItem][this.weekItem][this.dayItem] = parseLocal ;  
         }
+
+        this.$store.commit("setUserSchedule", JSON.stringify(this.allData));
+        this.$store.dispatch('updateData', this.user.id);
 
 
         this.editMode = !this.editMode;
@@ -130,7 +290,6 @@
   padding: 25px;
   margin: 20px;
   min-height: 300px;
-  max-height: 500px;
   background: $MondayBg;
   position: relative;
   font-family: 'Oswald', sans-serif;
@@ -159,10 +318,61 @@
     }
   }
 
+  &.wednesday {
+    background: $WednesdayBg;
+  }
+
+  &.tuesday {
+    background: $TuesdayBg;
+  }
+
+  &.friday {
+    background: $FridayBg;
+  }
+
+  &.edit-mode {
+    ul li {
+      .main {
+        flex: 1 0 65%;
+        margin-right: 2%;
+      }
+
+      .room {
+        flex: 1 0 20%;
+      }
+    }
+  }
+
+  .v-text-field--box input, .v-text-field--outline input {
+    margin-top: 0;
+  }
+
+  .v-text-field--box .v-input__slot, .v-text-field--outline .v-input__slot {
+    min-height: inherit;
+  }
+
+  .v-list__tile__content:last-child {
+    flex-direction: row;
+    .v-text-field__details {
+      display: none;
+    }
+  }
+
   .edit-icon {
     position: absolute;
     top: 10px;
     right: 10px;
+  }
+
+  .edit-info {
+    position: absolute;
+    right: -23px;
+    display: flex;
+    flex-direction: column;
+
+    .v-icon {
+      margin-bottom: 5px;
+    }
   }
   
   .corner {
@@ -197,7 +407,8 @@
     padding: 0;
     text-align: left;
     margin: 0; 
-    font-size: 32px;
+    width: 80%;
+    font-size: 24px;
     font-family: 'Russo One', sans-serif;
     font-weight: bold;
     input {
@@ -205,7 +416,7 @@
       color: #ddd;
       padding: 0;
       margin: 0; 
-      font-size: 32px;
+      font-size: 24px;
       border: none;
       font-family: Arial;
       font-weight: bold;
@@ -220,12 +431,13 @@
     list-style-type: none;
     padding: 0;
     text-align: left;
-    margin: 55px 0 30px 0;
+    margin: 20px 0 20px 0;
     li {
       width: 100%;
       margin: 0;
       margin-bottom: 28px;
       padding: 10px;
+      font-size: 16px;
       position: relative;
       display: flex;
       position: relative;
@@ -245,11 +457,12 @@
           white-space: nowrap;
           position: absolute;
           left: 40%;
-          bottom: -20px;
-          background: #ddd;
+          border: 1px solid #fff;
+          bottom: -17px;
+          background: #fabe5c;
           color: #fff;
           font-size: 15px;
-          padding: 5px;
+          padding: 0px 5px;
 
           .v-text-field__details {
             display: none;
@@ -269,7 +482,8 @@
 @media screen and (max-width: 768px) {
   .day {
     width: 100%;
-    margin: 0;
+    margin: 15px 0;
+    padding: 10px 25px 10px 10px;
   }
 }
 </style>

@@ -1,45 +1,48 @@
 <template>
 	<div class="sign-up">
 		<h1>Реєстрація</h1>
-		 <v-text-field light solo
-		 label="solo"
-	      v-model="email"
-	      placeholder="E-mail"
-	      required
-	    ></v-text-field>
-		<v-text-field light solo
-			placeholder="Пароль"
-	      v-model="password"
-	      required
-	      class="password-field"
-	    ></v-text-field>
-		<v-divider></v-divider>
+		<form>
+			 <v-text-field light solo
+			 label="solo"
+		      v-model="email"
+		      placeholder="E-mail"
+		      required
+		    ></v-text-field>
 			<v-text-field light solo
-			placeholder="Факультет"
-	      v-model="faculty"
-	    ></v-text-field>
-		<v-text-field light solo
-			placeholder="Група"
-	      v-model="group"
-	    ></v-text-field>
+				placeholder="Пароль"
+		      v-model="password"
+		      required
+		      class="password-field"
+		    ></v-text-field>
+			<v-divider></v-divider>
+				<v-text-field light solo
+				placeholder="Факультет"
+		      v-model="faculty"
+		    ></v-text-field>
+			<v-text-field light solo
+				placeholder="Група"
+		      v-model="group"
+		    ></v-text-field>
 
-	   <v-switch
-	      label="Я староста"
-	      v-model="admin"
-	    ></v-switch>
+		   <v-switch
+		      label="Я староста"
+		      v-model="admin"
+		      @change="getSch"
+		    ></v-switch>
 
-	    <v-autocomplete v-if="!admin" l
-        v-model="generalSchedule"
-        :items="items"
-        label="Вибрати розклад"
-      ></v-autocomplete>
+		    <v-autocomplete v-if="!admin" l
+	        v-model="generalSchedule"
+	        :items="items"
+	        label="Вибрати розклад"
+	      ></v-autocomplete>
 
-       
+	       
 
-      <v-text-field v-if="admin" light solo
-			placeholder="Назва розкладу"
-	      v-model="scheduleName"
-	    ></v-text-field>
+	      <v-text-field v-if="admin" light solo
+				placeholder="Назва розкладу"
+		      v-model="scheduleName"
+		    ></v-text-field>
+		 </form>
 
 	    <v-btn light @click.prevent="onSignup">Зараєструватись</v-btn>
 	    <v-btn light @click.prevent="onSigninGoogle">Google</v-btn>
@@ -83,6 +86,7 @@
 	      user () {
 	        return this.$store.getters.user
 	      },
+
 	      error () {
 	        return this.$store.getters.error
 	      },
@@ -98,28 +102,47 @@
 	      }
 	    },
 		methods: {
-				onSignup () {
-					let scheduleList = (this.admin) ? this.scheduleName : this.group;
-					let preJson = {
-						admin: this.admin,
-						group: this.group,
-						faculty: this.faculty,
-						schedules: {
-							list : [scheduleList],
-							[scheduleList]: {
-								weeks: ["weekTop"],
-								weekTop: {
-									name: "Чисельник",
-									days: ["day1"],
-									day1: {
-										name: "Понеділок",
-										subjects: []
-									}
+			getSch (){
+			    let sch = firebase.db.collection("users-schedules").where("admin", "==", true);
+			    sch.get().then(rez => {
+			    	console.log(rez);
+			    	rez.forEach(doc => {
+			    		let data = doc.data().schedules;
+			    		let generals = [];
+			    		console.log(data);
+			    		for (var item in data) {
+			    			console.log(item);
+			    			if (data[item].general) {
+			    				generals.push(item);
+			    			}
+			    		}
+			    		this.items = generals;
+				      console.log(generals);
+				    })
+			    });
+			},
+			onSignup () {
+				let scheduleList = (this.admin) ? this.scheduleName : this.group;
+				let preJson = {
+					admin: this.admin,
+					group: this.group,
+					faculty: this.faculty,
+					schedules: {
+						list : [scheduleList],
+						[scheduleList]: {
+							weeks: ["weekTop"],
+							weekTop: {
+								name: "Чисельник",
+								days: ["day1"],
+								day1: {
+									name: "Понеділок",
+									subjects: []
 								}
 							}
 						}
 					}
-					
+				}
+				
 				let payload = {
 					email: this.email, 
 					password: this.password,

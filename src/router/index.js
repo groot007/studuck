@@ -5,6 +5,8 @@ import Schedule from '../components/Schedule'
 import Profile from '../components/Profile'
 import Login from '../components/Login'
 import SignUp from '../components/SignUp'
+import Notif from '../components/Notification';
+import Geo from '../components/Geo';
 import firebase from '../shared/firebase';
 import AuthGuard from './auth-guard';
 
@@ -14,7 +16,7 @@ Vue.use(Router)
 const router = new Router({
   routes: [
     {
-      path: '/home',
+      path: '/',
       name: 'Home',
       component: Home
     },
@@ -34,6 +36,18 @@ const router = new Router({
       path: '/login',
       name: 'Login',
       component: Login
+    },
+    {
+      path: '/notification',
+      name: 'Notif',
+      component: Notif,
+      beforeEnter: AuthGuard
+    },
+    {
+      path: '/geo',
+      name: 'Geo',
+      component: Geo,
+      beforeEnter: AuthGuard
     },
     {
       path: '/signup',

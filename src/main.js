@@ -6,8 +6,11 @@ import App from './App.vue'
 import store from './store'
 import router from './router'
 import firebase from './shared/firebase';
-import colors from 'vuetify/es5/util/colors'
-
+import colors from 'vuetify/es5/util/colors';
+import VueApexCharts from 'vue-apexcharts'
+Vue.use(VueApexCharts)
+ 
+Vue.component('apexchart', VueApexCharts)
 
 Vue.use(Vuetify, {
   theme: {

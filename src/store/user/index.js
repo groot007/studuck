@@ -214,6 +214,7 @@ export default {
         email: payload.email,
         photoUrl: payload.photoURL
       });
+      router.replace('/')
       commit('removePreloader', false);
     },
     resetPasswordWithEmail ({ commit }, payload) {

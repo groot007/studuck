@@ -1,18 +1,22 @@
 <template>
 	<div class="login">
 		<h1>Вхід</h1>
-		 <v-text-field light solo
-	      v-model="email"
-	      placeholder="E-mail"
-	      required
-	    ></v-text-field>
-		<v-text-field light solo
-			placeholder="Пароль"
-	      v-model="password"
-	      required
-	    ></v-text-field>
-	    <v-btn light @click.prevent="onSignin">Увійти</v-btn>
-	    <v-btn light @click.prevent="onSigninGoogle">Google</v-btn>
+		<form>
+			<v-text-field light solo
+			type="email"
+		      v-model="email"
+		      placeholder="E-mail"
+		      required
+		    ></v-text-field>
+			<v-text-field light solo
+				type="password"
+				placeholder="Пароль"
+		      v-model="password"
+		      required
+		    ></v-text-field>
+		    <v-btn light @click.prevent="onSignin">Увійти</v-btn>
+		    <v-btn light @click.prevent="onSigninGoogle">Google</v-btn>
+	    </form>
 		<p>У Вас ще немає акаунта? <router-link to="/signup"> Створити </router-link></p>
 	</div>
 </template>

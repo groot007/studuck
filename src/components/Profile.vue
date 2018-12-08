@@ -1,7 +1,10 @@
 <template>
 	<div class="profile-wrap">
-
+		<a href="#" @click.prevent="logout">
+                
+              <v-icon>power_settings_new</v-icon><span class="logout-link" >Вийти</span></a>
 		<h1 @click="getUser">Реєстрація</h1>
+		<form>
 		<div class="user-inf">
 			<img :src="photoUrl" alt="">
 		</div>
@@ -50,7 +53,7 @@
 		<v-btn light @click="saveUserData">Зберегти</v-btn>
 		<v-btn light @click="linkToGoogle">Google</v-btn>
 		<v-btn light @click="unlinkToGoogle">unGoogle</v-btn>
-		
+		</form>
 	</div>
 </template>
 
@@ -78,6 +81,9 @@
 			}
 		},
 		methods: {
+			logout: function() {
+		      this.$store.dispatch('logout');
+		    },
 			getUser: function () {
 				console.log(this.$store.getters.user);
 			},

@@ -17,6 +17,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="base-pwa">
     <link rel="apple-touch-icon" href="<%= htmlWebpackPlugin.files.publicPath %>static/img/icons/apple-icon-152x152.png">
+    <link rel="apple-touch-startup-image" href="<%= htmlWebpackPlugin.files.publicPath %>static/img/icons/icons-512.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+
+    <link rel="apple-touch-startup-image" href="">
     
       <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
     <!-- Add to home screen for Windows -->
@@ -26,6 +29,7 @@
         for (var file of chunk.files) {
           if (file.match(/\.(js|css)$/)) { %>
     <link rel="<%= chunk.initial?'preload':'prefetch' %>" href="<%= htmlWebpackPlugin.files.publicPath + file %>" as="<%= file.match(/\.css$/)?'style':'script' %>"><% }}} %>
+    
   </head>
   <body>
     <noscript>
@@ -35,5 +39,6 @@
     <!-- Todo: only include in production -->
     <%= htmlWebpackPlugin.options.serviceWorkerLoader %>
     <!-- built files will be auto injected -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDxUC1RTA9-Uphj8_hPMV3f7RYk27TlwKU"> </script>
   </body>
 </html>

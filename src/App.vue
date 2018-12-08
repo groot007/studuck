@@ -1,6 +1,7 @@
 <template>
   <v-app dark>
   <div id="app">
+
     <!-- <div class="preloader" v-bind:class="{ active: preloader }"></div> -->
     <div class="panel-top">
       <div class="logo">
@@ -12,24 +13,67 @@
        <nav>
           <ul class="menu">
             <li>
-              <router-link to="/Home"><v-icon>home</v-icon> <span>Головна</span></router-link>
+              <router-link to="/"><v-icon>home</v-icon> <span>Головна</span></router-link>
             </li>
             <li>
-              <a href="#"><v-icon>location_on</v-icon> Google</a>
+              <router-link to="/notification"><v-icon>notifications</v-icon> <span>Сповіщення</span></router-link>
+            </li>
+            <li>
+              <router-link to="/geo"><v-icon>location_on</v-icon> <span>Google</span></router-link>
             </li>
             <li v-if="!isLogged">
-              <router-link to="/Login"><v-icon>account_circle</v-icon> <span>Увійти</span></router-link></li>
+              <router-link to="/Login"><v-icon>account_circle</v-icon> <span>Увійти</span></router-link>
+            </li>
             <li class="profile-link" v-if="isLogged">
               <router-link to="/profile"><v-icon>account_circle</v-icon><span>Профіль</span></router-link> 
             </li>
             <li v-if="isLogged">
               <router-link to="/schedule"><v-icon>schedule</v-icon> <span>Розклад</span></router-link></li>
-            <li><span class="logout-link" @click="logout">Вийти</span></li>
+            <li v-if="isLogged">
+              </li>
           </ul>
         </nav>
       </div>
     </div>
     <router-view></router-view> 
+    <div class="mmenu">
+      <div>
+        <router-link class="mmenu_item" to="/">
+          <span></span>
+          <v-icon>home</v-icon>
+        </router-link>
+      </div>
+      <div>
+        <router-link class="mmenu_item" to="/notification">
+          <span></span>
+          <v-icon>notifications</v-icon>
+        </router-link>
+      </div>
+      <div>
+        <router-link class="mmenu_item" to="/geo">
+          <span></span>
+          <v-icon>location_on</v-icon>
+        </router-link>
+      </div>
+      <div>
+        <router-link class="mmenu_item" to="/schedule">
+          <span></span>
+          <v-icon>schedule</v-icon>
+        </router-link>
+      </div>
+      <div v-if="!isLogged">
+        <router-link to="/login">
+          <span></span>
+          <v-icon>account_circle</v-icon>
+        </router-link>
+      </div>
+      <div v-if="isLogged">
+        <router-link class="mmenu_item" to="/profile">
+          <span></span>
+          <v-icon>account_circle</v-icon>
+        </router-link>
+      </div>
+    </div>
   </div>
 </v-app>
 </template>
@@ -40,6 +84,7 @@ export default {
   name: 'app',
   data () {
     return {
+      bottomNav: 'recent',
       titleSub: ""
     }
   },
@@ -58,6 +103,8 @@ export default {
       }
     }
 }
+
+
 </script>
 
 <style lang="scss">
@@ -72,9 +119,21 @@ export default {
   text-align: center;
   color: #fff;
 }
+.mmenu {
+  display: none;
+}
 
 .theme--dark.application {
   background: $bg;
+}
+
+.v-item-group.v-bottom-nav{
+  display: none;
+ 
+}
+
+img {
+  max-width: 100%;
 }
 
 body {
@@ -208,11 +267,57 @@ body a {
       display: none;
     }
   }
+  
+  .mmenu {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 56px;
+    align-items: center;
+    justify-content: space-around;
+    background-color: #252a20;
 
-  .panel-top .logo {
-    span {
-      display: none;
+    box-shadow: 0 0 5px #252a1f;
+    & > div {
+      width: 20%;
+      height: 100%;
     }
+  }
+
+  .mmenu_item {
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    .v-icon {
+          border-bottom: 2px solid transparent;
+    }
+    &.router-link-exact-active {
+      
+      
+      text-decoration: none;
+      .v-icon {
+          padding: 0 0 5px 0;
+          border-bottom: 2px solid #9acf00;
+      }
+    }
+  }
+
+  #app {
+    padding-top: 10px;
+    padding-bottom: 56px;
+  }
+
+  .panel-top {
+    display: none;
   }
 }
 </style>
