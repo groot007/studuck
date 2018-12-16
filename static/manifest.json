@@ -48,5 +48,7 @@
   "display": "fullscreen",
   "orientation": "portrait",
   "background_color": "#36474f",
-  "theme_color": "#36474f"
+  "theme_color": "#36474f",
+  "gcm_sender_id": "482941778795",
+  "gcm_sender_id_comment": "Do not change the GCM Sender ID"
 }

@@ -75,9 +75,14 @@
     </div>
     <div class="teacher-details" v-if="showTeacherBlock">
       <img :src="teacher.photo_url">
-      <span>{{teacher.surname}}</span>
-      <span>{{teacher.name}}</span>
-      <div><a href="#" @click.prevent="showTeacher">Назад</a></div>
+      
+      <div>
+        <span>{{teacher.surname}}</span> <span> {{teacher.name}}</span> <span> {{teacher.fatherName}}</span>
+      </div>
+      <div>
+        Facebook: <a :href=teacher.social>Перейти</a> 
+      </div>
+      <div><a href="#" class="goback" @click.prevent="showTeacher">Назад</a></div>
     </div>
     <div class="marks-block" v-if="showMarksBlock">
       <h2>Оцінки {{ marksSubject }}</h2>
@@ -113,7 +118,7 @@
                           <v-icon @click.prevent="props.item.lab--">remove</v-icon>  
                           <span>{{ props.item.lab }}</span>
                           <span>/</span>
-                          <span>{{ props.item.labs }}</span>
+                          <span>8</span>
                         </v-list-tile-content>
                       </v-list-tile>
                       <v-list-tile>
@@ -121,7 +126,9 @@
                         <v-list-tile-content class="align-end">
                           <v-icon @click.prevent="props.item.regular++">add_circle_outline</v-icon>  
                           <v-icon @click.prevent="props.item.regular--">remove</v-icon> 
-                          {{ props.item.regular }}
+                          <span>{{ props.item.regular }}</span>
+                          <span>/</span>
+                          <span>20</span>
                         </v-list-tile-content>
                       </v-list-tile>
                       <v-list-tile>
@@ -132,7 +139,10 @@
                             placeholder="Модуль"
                             box
                           ></v-text-field>
-                          {{ props.item.test }}
+                          
+                          <span>{{ props.item.test }}</span>
+                          <span>/</span>
+                          <span>30</span>
                         </v-list-tile-content>
                       </v-list-tile>
                     </v-list>
@@ -237,15 +247,20 @@
           this.$store.dispatch('updateData', this.user.id);
         }
       },
-      showTeacher() {
+      showTeacher(surname) {
         if (this.showDay) {
+          let surnameT = surname.split(' ')[0];
           this.showTeacherBlock = true;
           this.showDay = false;
           for (var item in this.teachers) {
-            console.log(item);
-            if (this.teachers[item].surname == 'Олексів') {
+            console.log(this.teachers);
+            if (this.teachers[item].surname == surnameT) {
               this.teacher.photo_url = this.teachers[item].photo_url;
               this.teacher.surname = this.teachers[item].surname;
+              this.teacher.name = this.teachers[item].name;
+              this.teacher.fatherName = this.teachers[item].fatherName;
+              this.teacher.details = this.teachers[item].details;
+              this.teacher.social = this.teachers[item].social;
             }
           }
         } else {
@@ -372,6 +387,22 @@
 
     .v-icon {
       margin-bottom: 5px;
+    }
+  }
+
+  .teacher-details {
+    img {
+      background: #ddd;
+      min-height: 210px;
+      width: 210px;
+      display: block;
+      margin: 0 auto 15px auto;
+      border-radius: 50%;
+      border: 8px solid #fff;
+    }
+
+    .goback, a {
+      color: #fff;
     }
   }
   

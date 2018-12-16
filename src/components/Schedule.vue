@@ -1,13 +1,5 @@
 <template>
 	<div>
-		<div class="notif" v-if="schedulesData.admin">
-			<v-text-field
-              v-model="message"
-              placeholder="Notification"
-              box
-            ></v-text-field>
-            <v-btn light @click.prevent="sendMessage">Send</v-btn>
-		</div>
 		<h1 @click="getUsersData">Розклад</h1>
 	
 	    <div class="schedule-title" >
@@ -65,11 +57,11 @@ export default {
 		  schedulesData () {
 		  	let data = this.$store.getters.userSchedule;
 		  	let that = this;
-	  		if (data && !data.admin) {
-				firebase.db.collection("notification").doc(data.group).onSnapshot(function(rez) {
-			        that.notif = rez.data().message;
-			    });
-			}
+	  // 		if (data && !data.admin) {
+			// 	firebase.db.collection("notification").doc(data.group).onSnapshot(function(rez) {
+			//         that.notif = rez.data().message;
+			//     });
+			// }
 			if (data) {
 				firebase.db.collection("teachers").doc('all').get().then( rez => {
 					this.teachers = rez.data();

@@ -1,17 +1,16 @@
 <template>
 	<div>
-		<h2><v-icon>home</v-icon>HOME</h2>
+		<!-- <h2><v-icon>home</v-icon>HOME</h2> -->
+    <div>
+      <img src="../assets/splashscreen.png">
+    </div>
+  <!--   <h2>Статистика навчання</h2>
 <div class="wrap-charts">
-  <h2>Статистика навчання</h2>
-  <div id="chart">
+  
+  <div id="chart" style="margin: 0 auto;">
       <apexchart type=line height=350 :options="chartOptions" :series="series" />
     </div>
-    <div id="chart">
-      <apexchart type=line height=350 :options="chartOptions" :series="series" />
-    </div>
-</div>
-   
-  </v-form>
+</div> -->
 	</div>
 	
 </template>
@@ -87,12 +86,12 @@ import VueApexCharts from "vue-apexcharts";
           xaxis: {
             categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
             title: {
-              text: 'Month'
+              text: 'Семестр'
             }
           },
           yaxis: {
             title: {
-              text: 'Temperature'
+              text: 'Оцінки'
             },
             min: 5,
             max: 40

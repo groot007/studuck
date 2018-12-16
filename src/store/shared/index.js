@@ -32,7 +32,7 @@ export default {
 		},
 
 		sendMessage ({commit}, payload) {
-			firebase.db.collection("notification").doc(payload.group).set(payload.json);
+			firebase.db.collection("notification").doc(payload.group).set(payload.json, {merge: true});
 		}
 	},
 	getters: {

@@ -1,9 +1,9 @@
 <template>
 	<div class="profile-wrap">
-		<a href="#" @click.prevent="logout">
+		<a href="#" @click.prevent="logout" class="logout">
                 
               <v-icon>power_settings_new</v-icon><span class="logout-link" >Вийти</span></a>
-		<h1 @click="getUser">Реєстрація</h1>
+		<h1 @click="getUser">Профіль</h1>
 		<form>
 		<div class="user-inf">
 			<img :src="photoUrl" alt="">
@@ -113,8 +113,19 @@ h2 {
 
 .profile-wrap {
 	width: 320px;
+	position: relative;
 	margin: 0 auto;
-	padding: 0 15px;
+	padding: 30px 15px;
+}
+
+.logout {
+	position: absolute;
+    right: 0;
+    top: 0;
+    vertical-align: middle;
+    font-size: 20px;
+    color: #f00;
+    text-decoration: none;
 }
 
 .user-inf {

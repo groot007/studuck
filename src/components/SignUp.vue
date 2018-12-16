@@ -9,10 +9,16 @@
 		      required
 		    ></v-text-field>
 			<v-text-field light solo
+			type="password"
 				placeholder="Пароль"
 		      v-model="password"
 		      required
 		      class="password-field"
+		    ></v-text-field>
+		    <v-divider></v-divider>
+				<v-text-field light solo
+				placeholder="Прізвище, ім'я"
+		      v-model="name"
 		    ></v-text-field>
 			<v-divider></v-divider>
 				<v-text-field light solo
@@ -61,6 +67,7 @@
 				password: '',
 				faculty: '',
 				group: '',
+				name: '',
 				admin: false,
 				emptySchedule: {
 					user: "",
@@ -126,6 +133,7 @@
 				let preJson = {
 					admin: this.admin,
 					group: this.group,
+					name: this.name,
 					faculty: this.faculty,
 					schedules: {
 						list : [scheduleList],
